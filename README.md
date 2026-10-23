@@ -211,7 +211,7 @@ Requires DeepSeek Harness. The plugin only uses the host slots and `webServer` p
 **Option 1 — let an agent install it (recommended)**
 
 ```text
-git clone https://github.com/<owner>/dsh-fairy-zzz.git
+git clone https://github.com/AssassinVIX/dsh-fairy-zzz.git
 ```
 
 then, in a DSH session:
