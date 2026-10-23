@@ -34,7 +34,7 @@
 **方式一：让 agent 装（推荐）**
 
 ```text
-git clone https://github.com/AssassinVIX/dsh-fairy-zzz.git
+git clone https://github.com/AssassinVIX/fairy-zzz-plugin.git
 ```
 
 然后在 DSH 会话里：
@@ -211,7 +211,7 @@ Requires DeepSeek Harness. The plugin only uses the host slots and `webServer` p
 **Option 1 — let an agent install it (recommended)**
 
 ```text
-git clone https://github.com/AssassinVIX/dsh-fairy-zzz.git
+git clone https://github.com/AssassinVIX/fairy-zzz-plugin.git
 ```
 
 then, in a DSH session:
