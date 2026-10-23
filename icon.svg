@@ -15,12 +15,12 @@
       <stop offset="1" stop-color="#222f9d"/>
     </linearGradient>
     <linearGradient id="plate" x1="0.3" y1="0.15" x2="0.7" y2="1">
-      <stop offset="0" stop-color="#32347d"/>
-      <stop offset="1" stop-color="#262863"/>
+      <stop offset="0" stop-color="#363a86"/>
+      <stop offset="1" stop-color="#2a2d70"/>
     </linearGradient>
     <radialGradient id="socket" cx="0.5" cy="0.52" r="0.5">
-      <stop offset="0.7" stop-color="#1b2064" stop-opacity="0.5"/>
-      <stop offset="0.82" stop-color="#1b2064" stop-opacity="0.22"/>
+      <stop offset="0.72" stop-color="#1b2064" stop-opacity="0.34"/>
+      <stop offset="0.86" stop-color="#1b2064" stop-opacity="0.16"/>
       <stop offset="1" stop-color="#1b2064" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="white" x1="0.5" y1="0" x2="0.5" y2="1">

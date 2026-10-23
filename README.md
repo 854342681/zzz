@@ -1,5 +1,7 @@
 # Fairy Ⅲ · 绝区零 H.D.D 皮肤
 
+**中文** · [English](#english)
+
 把 DeepSeek Harness 的 Web 界面换成《绝区零》Fairy 的 H.D.D 终端：满屏开机动画 → 居中问好 → 收成会话区左侧的常驻眼徽，并可用本地 GPT-SoVITS 的 Fairy 音色把回复念出来。
 
 ![开机动画](screenshots/01-boot.png)
@@ -168,3 +170,179 @@ install-windows.ps1  # Windows 安装/卸载脚本
 - 本仓库代码以 **MIT** 发布（见 `LICENSE`）。
 - 眼徽 SVG、动画几何与时长、眼睑/眨眼实现参考了 [Chengzhibense/Fairy-DSH](https://github.com/Chengzhibense/Fairy-DSH)（Apache-2.0，commit 见 `NOTICE-fairy-dsh.md`）；对照视频为 BV1SD4C63EZz「可能是全网最还原的Fairy」。
 - 开机视频素材与角色形象版权归 miHoYo / HoYoverse 所有，这里只做个人桌面的视觉改造，请勿用于商业用途。
+
+---
+
+# English
+
+[中文](README.md) · **English**
+
+A **Fairy Ⅲ · Zenless Zone Zero H.D.D skin** for DeepSeek Harness.
+
+It turns the DSH web interface into Fairy's H.D.D terminal: a full-screen boot animation, then a centered greeting, then the emblem tucks itself into a permanent eye badge at the left edge of the conversation area — and replies can be read aloud in a local GPT-SoVITS Fairy voice.
+
+![Boot animation](screenshots/01-boot.png)
+![Centered greeting](screenshots/02-greet.png)
+
+| Eye badge states | Settings panel |
+| --- | --- |
+| ![Eye badge](screenshots/03-eye-states.png) | ![Settings](screenshots/04-settings.png) |
+
+## Features
+
+- **Boot animation** — the H.D.D startup clip fills the screen with `object-fit: contain`, and the leftover area is filled with a blurred copy of the same frame, so no hard black bars appear at any window ratio.
+- **Centered greeting** — when the clip ends, the H.D.D eye badge (deep-blue ring / white disc / blue iris / highlight dot) fades in over a blue glow, with a mirrored `HOLLOW DEEP DIVE SYSTEM` title and a time-of-day greeting (small hours / morning / noon / afternoon / evening / late night) played together with a matching pre-recorded audio clip.
+- **Badge hand-off** — about 1.9 s after the greeting the badge flies to the middle of the left edge of the conversation area (inside the blue ring next to the sidebar) and stays there while the glow fades out. The badge is a status indicator only; clicking it no longer opens a panel.
+- **State animations** (geometry and timings replicate the reference implementation, Fairy-DSH):
+  - `idle` — breathing, slow rotation, a sweeping scan light;
+  - `thinking` / `working` — the upper eyelid drops to half-closed and breathes slightly;
+  - random blinks while idle (every 3.4–8.6 s, ~24% chance of a double blink, sometimes followed by a glance);
+  - random idle "glitch" — the whole eye is sliced into 2–4 horizontal bands and shifted sideways;
+  - `done` — a quick eyelid sweep.
+- **Brand slot replacement** — the official SVG wordmark is hidden and the Fairy eye badge plus an italic `Fairy` wordmark are overlaid in the same spot, positioned from measurements of the official element so it stays responsive.
+- **Theme** — deep-blue glass with cyan neon tokens, grid and scanline wallpaper, an H.D.D-style scrollbar and focus glow.
+- **Voice** — the opening greeting is a pre-recorded wav and needs no engine; later replies can be read aloud automatically or with a per-message button through a local GPT-SoVITS (CPU inference).
+- **Settings panel** — DSH's *Settings → Fairy* manages the read-aloud switch, engine status, engine directory, sampling, replay and tests.
+
+## Install
+
+Requires DeepSeek Harness. The plugin only uses the host slots and `webServer` passed at runtime; it never imports `@deepseek-ai/*`.
+
+**Option 1 — let an agent install it (recommended)**
+
+```text
+git clone https://github.com/<owner>/dsh-fairy-zzz.git
+```
+
+then, in a DSH session:
+
+```text
+plugin_manager install_bundle  target=<path to the cloned folder>
+```
+
+**Option 2 — merge the patch by hand**
+
+Merge the `insert` block from `cordis.patch.yml` into your profile patch (on Windows usually `%USERPROFILE%\.dsh\profiles\<profile>\cordis.patch.yml`):
+
+```yaml
+- insert:
+    - id: fairy-zzz-skin
+      name: 'dsh-fairy-zzz'
+```
+
+Reload the whole page once installed. The skin only inserts one line and registers two HTTP routes on the host; it does not modify any file that ships with DSH.
+
+**Option 3 — Windows one-click script**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1            # install
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -Uninstall  # uninstall
+```
+
+The script finds your profile, copies the plugin into `node_modules\dsh-fairy-zzz`, adds the patch and switches a light theme to dark. If you would rather not let a script edit files, use option 1 or 2.
+
+> **Upgrading from older versions**: from 1.0.0 the package name changed from `@local/dsh-fairy-zzz` to `dsh-fairy-zzz` (so it can be listed and installed from npm). Change `name: '@local/dsh-fairy-zzz'` to `name: 'dsh-fairy-zzz'` in your profile patch, and move the plugin directory from `node_modules\@local\dsh-fairy-zzz` to `node_modules\dsh-fairy-zzz`.
+
+> `presets/fairy-mode.patch.yml` is an **optional** "Fairy mode" agent preset (snarky AI tone, addresses you as "Master"). It depends on a lot of `@deepseek-ai/dsh-*` plugins whose tool sets differ between DSH versions, so it is not enabled by default; to use it, append it to your profile patch as described at the top of the file and make sure every plugin it lists exists in your version.
+
+## Settings (Settings → Fairy)
+
+| Control | What it does |
+| --- | --- |
+| Read replies aloud | Speaks each assistant answer when it finishes; with it off you can still use the speaker button next to a message |
+| Voice engine | Engine status light: green = ready, yellow = starting, grey = not running |
+| Engine directory | Type a directory → `Save` (writes `<plugin dir>/voice-home.txt`), `Detect` (validate without saving), `Clear` (back to auto-detection) |
+| Start / Stop engine | Host-managed engine start and stop |
+| Refresh status | Re-probe immediately |
+| Play greeting / Replay boot | Replay the latest greeting audio / run the boot → greeting → badge sequence again |
+| Test voice / Stop | Synthesize a test line / stop current playback |
+
+## Voice engine (optional)
+
+The skin, the boot animation and the pre-recorded greeting need no engine — only "read replies aloud" does.
+
+The engine directory must contain:
+
+```text
+<engine dir>/
+  fairy_server.py        # entry point (--port)
+  GPT-SoVITS/            # the engine itself
+  models/                # Fairy's .pth / .ckpt and reference audio
+  py311/                 # optional: portable Python
+```
+
+Lookup order (a user-specified directory always wins):
+
+1. `<plugin dir>/voice-home.txt` — the directory saved in the settings panel;
+2. the `FAIRY_VOICE_HOME` environment variable;
+3. `voice/` next to the plugin (portable bundle);
+4. the legacy `FAIRY_TTS_DIR` environment variable (compatibility).
+
+If none of them is found the skin still works, and the settings panel points you to the directory field.
+
+Other environment variables:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `FAIRY_TTS_PORT` | `9800` | Port the engine listens on |
+| `FAIRY_CACHE_DIR` | `<plugin dir>/cache` | Where synthesized audio and the disk cache go |
+
+Engine logs are written to `server.log` in the engine directory. Loading on CPU takes about 20 s; until it finishes the settings panel shows "starting".
+
+## HTTP routes
+
+The host side only registers these read-only/local routes (prefix `/fairy-zzz`):
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/fairy-zzz/assets/<file>` | `boot.mp4` / `poster.jpg` / `hero.png` / `voice/greet-*.wav` (Range supported) |
+| GET | `/fairy-zzz/audio/<hash>.wav` | Synthesized-audio cache (Range supported) |
+| POST | `/fairy-zzz/tts` | `{ text }` → `{ url, cached, seconds }`; strips markdown/code blocks and truncates to 500 characters |
+| GET | `/fairy-zzz/health` | `{ ok, engine, voice, speed, home }` |
+| GET | `/fairy-zzz/mood` | `idle` / `thinking` / `working` / `done` (drives the badge) |
+| GET | `/fairy-zzz/voice-home` | Current engine directory and where it came from |
+| POST | `/fairy-zzz/voice-home` | Save / validate the engine directory |
+| GET | `/fairy-zzz/engine` | Engine process state |
+| POST | `/fairy-zzz/engine` | `{ action: "start" \| "stop" }` |
+
+## How the screenshots were made
+
+The images in `screenshots/` are not remote links: the boot frame is taken from `assets/boot.mp4`, and the rest are rendered offline by extracting the CSS and the eye-badge SVG from `client.js` and rendering them with the same styles. The repository has no runtime dependencies and no build output.
+
+## Known limitations
+
+- The official wordmark is inline SVG with no replaceable text node, and `sidebar.brand.mark/name` are `single` slots that the first registrant keeps, so the skin hides the official wordmark and overlays its own at the same position instead of doing a real slot replacement. If the official DOM changes, the selectors may need updating.
+- The desktop shell's window title, menus and sidebar labels belong to the app itself; a plugin cannot change them.
+- Other plugins that claim the bottom-left/right corners (whale widget, desktop pet) may look cluttered when enabled together.
+- The voice engine is an optional external dependency; the repository ships neither weights nor the engine itself.
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| The engine stays "not running" in Settings | Check that the engine directory has `fairy_server.py`, `GPT-SoVITS/` and `models/`; read `<engine dir>/server.log` |
+| The old path is still shown after saving | The old host process has no `voice-home` route; restart DSH once |
+| Replies are not spoken but the greeting plays | The greeting is a pre-recorded wav and does not use the engine; with no engine running only read-aloud fails silently |
+| No badge or wordmark appears | Check that `fairy-zzz-skin` is in your profile patch and reload the whole page |
+
+## Repository layout
+
+```text
+cordis.patch.yml     # one insert line (the skin itself)
+client.js            # client: theme, boot/greeting/badge, settings panel, voice actions
+index.js             # host: static assets, TTS queue and cache, mood, engine supervision
+assets/              # boot.mp4 / poster.jpg / hero.png / voice/greet-*.wav
+presets/             # optional "Fairy mode" agent preset
+screenshots/         # screenshots used above
+install-windows.ps1  # Windows install/uninstall script
+```
+
+## Credits & license
+
+- The code in this repository is released under the **MIT** license (see `LICENSE`).
+- The eye-badge SVG, the animation geometry and timings, and the eyelid/blink implementation reference [Chengzhibense/Fairy-DSH](https://github.com/Chengzhibense/Fairy-DSH) (Apache-2.0; commit in `NOTICE-fairy-dsh.md`); the comparison video is BV1SD4C63EZz「可能是全网最还原的Fairy」.
+- The boot video assets and the character likeness belong to miHoYo / HoYoverse. This is a personal desktop visual reskin only — do not use it commercially.
+
+---
+
+[↑ 返回中文 / Back to Chinese](README.md)
