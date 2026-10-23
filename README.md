@@ -32,7 +32,7 @@
 **方式一：让 agent 装（推荐）**
 
 ```text
-git clone https://github.com/<owner>/dsh-fairy-zzz.git
+git clone https://github.com/AssassinVIX/dsh-fairy-zzz.git
 ```
 
 然后在 DSH 会话里：
