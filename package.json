@@ -1,0 +1,32 @@
+{
+  "name": "@local/dsh-fairy-zzz",
+  "version": "4.9.0",
+  "private": true,
+  "type": "module",
+  "description": "绝区零 Fairy 皮肤：H.D.D 开机动画、全息眼核心、时段问候、随机眨眼/花屏、思考眼睑，以及随包自带的 GPT-SoVITS 本地语音",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "assets",
+    "locale",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  }
+}
