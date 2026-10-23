@@ -1,12 +1,12 @@
 window.__ModuleLoader__.load({
-  id: '@local/dsh-fairy-zzz',
+  id: 'dsh-fairy-zzz',
   factory(require) {
     const React = require('react')
     const h = React.createElement
     const { useCallback, useEffect, useRef, useState } = React
 
     const NS = 'fairy-zzz'
-    const PKG = '@local/dsh-fairy-zzz'
+    const PKG = 'dsh-fairy-zzz'
     const VOICE_KEY = 'fairy.zzz.voice'
     const SEEN_KEY = 'fairy.zzz.seen'
     const greetSlot = () => {
@@ -825,7 +825,6 @@ body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opac
     /* 待机随机小动作：眨眼（偶尔连眨）+ 偶尔瞟一眼。
        眨眼是整只眼纵向压扁成一条光缝再弹回，300ms 一次。 */
     const BLINK_MS = 300
-    const BLINK_TEST = false
     let lastGlitchAt = 0
     const bootHooks = new Set()
 
@@ -881,10 +880,6 @@ body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opac
       }, [mood, phase, fireGlitch])
 
       useEffect(() => {
-        if (BLINK_TEST) {
-          const t = setTimeout(() => setBlink('1'), 1400)
-          return () => clearTimeout(t)
-        }
         if (phase === 'boot') return undefined
         let alive = true
         let timer = null
@@ -1323,48 +1318,6 @@ body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opac
     }
 
     /* ------------------------------------------------------------------ *
-     * ———————————— */
-    function BuildWatch() {
-      useEffect(() => {
-        let stop = false
-        let timer = null
-        const tick = () => {
-          fetch('/fairy-zzz/assets/build.txt?t=' + Date.now(), { cache: 'no-store' })
-            .then((res) => (res.ok ? res.text() : null))
-            .then((text) => {
-              if (stop || !text) return
-              const next = text.trim()
-              const prev = localStorage.getItem('fairy.zzz.build')
-              if (!prev) {
-                localStorage.setItem('fairy.zzz.build', next)
-                return
-              }
-              if (prev !== next) {
-                localStorage.setItem('fairy.zzz.build', next)
-                /* 只在开发模式（localStorage['fairy.zzz.dev']='1'）才自动重载：
-                   桌面壳里重载会让 web-boot 重新导入一遍插件，容易触发
-                   "web boot: 1 entry did not activate / import failed" 的崩溃对话框。 */
-                try {
-                  if (localStorage.getItem('fairy.zzz.dev') === '1') location.reload()
-                } catch (e) {}
-                return
-              }
-            })
-            .catch(() => {})
-            .then(() => {
-              if (!stop) timer = setTimeout(tick, 3000)
-            })
-        }
-        timer = setTimeout(tick, 1600)
-        return () => {
-          stop = true
-          if (timer) clearTimeout(timer)
-        }
-      }, [])
-      return null
-    }
-
-    /* ------------------------------------------------------------------ *
      * 主界面：开机→问好→左下坞 */
     function greetLine() {
       const hh = new Date().getHours()
@@ -1649,73 +1602,9 @@ body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opac
 
         guard('tokens', () => {
           const theme = ctx.get && ctx.get('theme')
-          if (theme && typeof theme.overrideTokens === 'function') theme.overrideTokens('@local/dsh-fairy-zzz', TOKENS)
+          if (theme && typeof theme.overrideTokens === 'function') theme.overrideTokens(PKG, TOKENS)
         })
 
-        /* 轻量自检：页面加载 4s 后把图层状态回传给宿主（写 E:\\Fairy\\_diag\\client-diag.log），
-           皮肤出问题时直接看这个文件即可，不影响正常渲染。 */
-        guard('diag', () => {
-          if (typeof window === 'undefined') return
-          const errs = []
-          window.addEventListener('error', (e) => errs.push('ERROR ' + (e && e.message) + ' @ ' + (e && e.lineno)))
-          window.addEventListener('unhandledrejection', (e) => errs.push('REJECT ' + String(e && e.reason && (e.reason.message || e.reason))))
-          const send = (delay) => setTimeout(() => {
-            try {
-              const layer = document.querySelector('.fz3-layer')
-              const frame = document.querySelector('[class*="_frame"]')
-              const eye = document.querySelector('.fz3-eye')
-              const core = document.querySelector('.fz3-core')
-              const copy = document.querySelector('.fz3-copy')
-              const tap = document.querySelector('.fz3-tap')
-              const rect = (el) => {
-                if (!el) return null
-                const r = el.getBoundingClientRect()
-                return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) }
-              }
-              const vw = window.innerWidth
-              const vh = window.innerHeight
-              const cands = []
-              try {
-                const nodes = document.querySelectorAll('div,main,section,aside,nav')
-                for (let i = 0; i < nodes.length && cands.length < 26; i += 1) {
-                  const el = nodes[i]
-                  const b = el.getBoundingClientRect()
-                  if (b.width < 260 || b.height < 240) continue
-                  if (b.left < 120 || b.left > 700) continue
-                  const cls = String(el.className || '').slice(0, 70)
-                  if (!cls) continue
-                  cands.push({ c: cls, x: Math.round(b.left), y: Math.round(b.top), w: Math.round(b.width), h: Math.round(b.height) })
-                }
-              } catch (e) {}
-              const cr = rect(copy)
-              const payload = {
-                at: new Date().toISOString(),
-                href: location.href,
-                vp: vw + 'x' + vh,
-                phase: layer ? layer.getAttribute('data-phase') : null,
-                mood: layer ? layer.getAttribute('data-mood') : null,
-                frameVisible: frame ? getComputedStyle(frame).visibility : null,
-                blink: eye ? eye.getAttribute('data-blink') : null,
-                glance: eye ? eye.getAttribute('data-glance') : null,
-                blinks: window.__fz3Blinks || 0,
-                glitches: window.__fz3Glitches || 0,
-                dock: window.__fz3Dock || null,
-                cands: cands,
-                core: rect(core),
-                copy: cr,
-                tap: rect(tap),
-                fit: cr ? { overflowX: cr.x < 0 || cr.x + cr.w > vw, overflowY: cr.y + cr.h > vh } : null,
-                textLen: (document.body.innerText || '').length,
-                nodes: document.querySelectorAll('*').length,
-                errs: errs.slice(0, 10),
-              }
-              fetch('/fairy-zzz/diag', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {})
-            } catch (e) {}
-          }, delay)
-          send(4000)
-          send(26000)
-          send(44000)
-        })
         const mount = (key, spec, component) => {
           guard('inject:' + key, () => {
             ctx.slots.inject(key, () => {
@@ -1730,12 +1619,10 @@ body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opac
         mount('sidebar.brand.name', { id: 'fairy-zzz-brandname', priority: 100 }, BrandName)
         mount('shell.overlay', { id: 'fairy-zzz-skin', order: 24 }, FairySkin)
         mount('shell.overlay', { id: 'fairy-zzz-atmos', order: 12 }, Atmos)
-        mount('shell.overlay', { id: 'fairy-zzz-build', order: 5 }, BuildWatch)
-        mount('conversation.chat.assistant-actions', { id: 'fairy-zzz-voice', order: 20, label: '朗读' }, VoiceAction)
+            mount('conversation.chat.assistant-actions', { id: 'fairy-zzz-voice', order: 20, label: '朗读' }, VoiceAction)
         mount('settings.section', { id: 'fairy-zzz-settings', order: 40, label: 'Fairy' }, FairySettings)
       },
     }
   },
 })
 
-// touch: 1792685830629

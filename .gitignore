@@ -1,0 +1,10 @@
+node_modules/
+cache/
+diag/
+voice/
+voice-home.txt
+*.log
+.DS_Store
+Thumbs.db
+*.bak
+*.bak-*

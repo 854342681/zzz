@@ -1,23 +1,38 @@
 {
-  "name": "@local/dsh-fairy-zzz",
-  "version": "4.9.0",
-  "private": true,
+  "name": "dsh-fairy-zzz",
+  "version": "1.0.0",
+  "description": "Zenless Zone Zero Fairy skin for the DSH Web UI: H.D.D boot animation, animated eye core, time-of-day greeting line, idle blink and glitch, thinking eyelid, plus optional local GPT-SoVITS voice.",
   "type": "module",
-  "description": "绝区零 Fairy 皮肤：H.D.D 开机动画、全息眼核心、时段问候、随机眨眼/花屏、思考眼睑，以及随包自带的 GPT-SoVITS 本地语音",
+  "license": "MIT",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek-harness",
+    "theme",
+    "skin",
+    "zenless-zone-zero",
+    "fairy",
+    "tts"
+  ],
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
-    "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
+  "icon": "icon.svg",
   "files": [
     "index.js",
     "client.js",
     "cordis.patch.yml",
     "assets",
-    "locale",
+    "presets",
+    "screenshots",
+    "screenshots.json",
     "icon.svg",
-    "README.md"
+    "install-windows.ps1",
+    "README.md",
+    "LICENSE",
+    "NOTICE-fairy-dsh.md"
   ],
   "dsh": {
     "bundle": {

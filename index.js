@@ -1,5 +1,5 @@
 import { createReadStream, existsSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { appendFile, mkdir, stat } from 'node:fs/promises'
+import { mkdir, stat } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { extname, join, resolve, sep } from 'node:path'
@@ -8,11 +8,14 @@ import { fileURLToPath } from 'node:url'
 /**
  * Fairy Ⅲ · H.D.D Skin — Host half.
  *
- *   GET  /fairy-zzz/assets/<file>   boot.mp4 / poster.jpg / hero.png / voice/greet.wav
+ *   GET  /fairy-zzz/assets/<file>   boot.mp4 / poster.jpg / hero.png / voice/greet-*.wav
  *   GET  /fairy-zzz/audio/<hash>.wav synthesized voice cache (Range capable)
  *   POST /fairy-zzz/tts             { text } -> { url, cached, seconds }
+ *   GET  /fairy-zzz/mood            { mood } -> idle | thinking | working | done
  *   GET  /fairy-zzz/voice-home      { ok, home, source, reason }
  *   POST /fairy-zzz/voice-home      { home, probe? } -> 保存/校验引擎目录
+ *   GET  /fairy-zzz/engine          { phase, home, error } -> 本地语音引擎状态
+ *   POST /fairy-zzz/engine          { action: 'start' | 'stop' }
  *   GET  /fairy-zzz/health          { ok, engine, voice }
  *
  * The Client half owns every pixel; this half owns bytes, cache and the local
@@ -23,7 +26,7 @@ export const inject = ['webServer']
 
 const HERE = fileURLToPath(new URL('.', import.meta.url))
 const ASSETS = join(HERE, 'assets')
-const CACHE = join(HERE, 'cache')
+const CACHE = process.env.FAIRY_CACHE_DIR || join(HERE, 'cache')
 
 const TTS_PORT = Number(process.env.FAIRY_TTS_PORT || 9800)
 
@@ -418,25 +421,6 @@ export function apply(ctx) {
           return
         }
         return sendFile(req, res, join(CACHE, rest.slice(1)))
-      },
-    }),
-  )
-
-  ctx.effect(() =>
-    webServer.register({
-      kind: 'exact',
-      path: '/fairy-zzz/diag',
-      handler: async (req, res) => {
-        try {
-          const raw = await readBody(req, 256 * 1024)
-          const dir = process.env.FAIRY_DIAG_DIR || join(HERE, 'diag')
-          const file = join(dir, 'client-diag.log')
-          await mkdir(dir, { recursive: true })
-          await appendFile(file, raw + '\n', 'utf8')
-          sendJson(res, 200, { ok: true })
-        } catch (cause) {
-          sendJson(res, 500, { error: String(cause?.message ?? cause) })
-        }
       },
     }),
   )
