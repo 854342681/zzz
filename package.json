@@ -17,9 +17,9 @@
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
-    "./icon": "./icon.svg"
+    "./icon": "./assets/icon-180.png"
   },
-  "icon": "icon.svg",
+  "icon": "assets/icon-180.png",
   "files": [
     "index.js",
     "client.js",
