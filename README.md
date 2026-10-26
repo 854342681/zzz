@@ -69,9 +69,20 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -Uninstall  # 卸
 > 并把插件目录从 `node_modules\@local\dsh-fairy-zzz` 换到 `node_modules\dsh-fairy-zzz`。
 
 
-> `presets/fairy-mode.patch.yml` 是**可选**的「Fairy 模式」agent 预设（毒舌 AI 腔、称你为「主人」）。
-> 它依赖较多 `@deepseek-ai/dsh-*` 插件，不同 DSH 版本的工具集不一样，所以默认不在 patch 里启用；
-> 想用就按文件开头的说明把它追加到 profile patch，并确认列出的插件在你的版本里都存在。
+## 「Fairy 模式」预设（可选）
+
+`presets/` 下三个文件，按需要挑一个：
+
+| 文件 | 内容 | 什么时候用 |
+| --- | --- | --- |
+| `fairy-mode.patch.yml` | **只装人设**：预设里只有 `@deepseek-ai/dsh-persona` 一项，不带任何工具/上下文插件 | 想要 Fairy 的语气，但工具集沿用你当前 DSH 的配置 |
+| `fairy-mode.full.patch.yml` | 4.9.0 原版：人设 + 19 个 `@deepseek-ai/dsh-*` 工具与上下文插件 | 想要一个自带完整工具链的独立模式，且确认这些包在你的 DSH 版本里都存在 |
+| `fairy-persona.md` | 纯人设文本（前缀 + 覆盖声明） | 只想把文本塞进别的提示词注入器，例如 `dsh-zh` 的 `zhPromptText` |
+
+用法：把选中的 patch 内容追加到你的 profile patch（Windows 一般是
+`%USERPROFILE%\.dsh\profiles\<profile>\cordis.patch.yml`），重启 DSH，新建会话的模式选择器里就会多出「Fairy 模式」。
+
+> 皮肤本体与这个预设互不依赖：不装预设也有皮肤，不装皮肤也能用预设。
 
 ## 设置（设置 → Fairy）
 
