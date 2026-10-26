@@ -9,9 +9,6 @@
 # 重启 DSH 后，新建会话的模式选择器里会多出「Fairy 模式」。
 #
 # 注意：预设本身不带工具与上下文插件，工具集取决于开这个会话时的 DSH 配置。
-# 如果你要的是 4.9.0 那种「自带一整套工具」的模式，用同目录的 fairy-mode.full.patch.yml。
-#
-# 只想复制人设文本（比如塞进别的提示词注入器）：见 presets/fairy-persona.md。
 - insert:
     - id: preset-fairy
       name: '@deepseek-ai/dsh-agent-preset'
